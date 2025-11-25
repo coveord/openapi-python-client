@@ -16,22 +16,27 @@ jobs:
       matrix:
         python: [ 3.6, 3.7, 3.8, 3.9 ]
     steps:
-    - uses: actions/checkout@v2
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@c6295a65d1254861815972266d5933fd6e532bdf # v2.11.1
+      with:
+        egress-policy: audit
+
+    - uses: actions/checkout@ee0669bd1cc54295c223e0bb666b733df41de1c5 # v2.7.0
     - name: Set up Python
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@0f07f7f756721ebd886c2462646a35f78a8bc4de # v1.2.4
       with:
         python-version: ${{ matrix.python }}
     - name: Cache dependencies
-      uses: actions/cache@v2
+      uses: actions/cache@8492260343ad570701412c2f464a5877dc76bace # v2
       with:
         path: .venv
         key: ${{ runner.os }}-${{ matrix.python }}-dependencies-${{ hashFiles('**/poetry.lock') }}
         restore-keys: |
           ${{ runner.os }}-${{ matrix.python }}-dependencies-
     - name: Install dependencies
-      uses: triaxtec/github-actions/python/install-and-configure-poetry@main
+      uses: triaxtec/github-actions/python/install-and-configure-poetry@cf872aea99a138041dadbcad3f736f7ddf6d1a51 # main
     - name: Run Checks
-      uses: triaxtec/github-actions/python/run-checks@main
+      uses: triaxtec/github-actions/python/run-checks@cf872aea99a138041dadbcad3f736f7ddf6d1a51 # main
       with:
         module: openapi_python_client
 
@@ -41,6 +46,6 @@ jobs:
     - name: Generate E2E Coverage
       run: poetry run coverage xml -o e2e-coverage.xml
 
-    - uses: codecov/codecov-action@v1
+    - uses: codecov/codecov-action@29386c70ef20e286228c72b668a06fd0e8399192 # v1.5.2
       with:
         files: ./coverage.xml,./e2e-coverage.xml
